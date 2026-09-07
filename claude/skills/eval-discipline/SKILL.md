@@ -11,6 +11,10 @@ synthetic data); this skill governs the *shape* of the evaluators and the report
 
 ## Directives
 
+- **The KPI list comes from `PRODUCT.md` when it exists.** Its *Failure modes* table is the
+  evaluator list — one Evaluator per row, `name` equal to the row's post-ship signal name so a
+  production drop maps straight to the eval to rerun. Thresholds come from *Pre-ship evidence*.
+  A column with no row in PRODUCT.md is ornamental until the human adds the row.
 - **KPI-based, never generic.** Every evaluator traces to a real failure mode (found
   via error analysis) or a business KPI. Ten meaningful columns beat thirty ornamental
   ones. If you can't name the failure mode or KPI a column defends, don't add it.

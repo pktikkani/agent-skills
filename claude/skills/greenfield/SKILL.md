@@ -7,7 +7,35 @@ description: Bootstrap a new project with a lean architecture contract. Use when
 
 Bootstrap a new repo with a discipline contract that a returning agent (or you, months later) can re-enter in one file-read instead of codebase archaeology. Generate the files below **in the new repo's root** (adapt content to the actual project — do not paste the examples verbatim). If a file already exists, update it; never clobber real content.
 
-Core loop this skill enforces: **every session, reread `BLUEPRINT.md` before writing code; update `STATUS.md` as your last act before ending the session.**
+Core loop this skill enforces: **`PRODUCT.md` is written before `BLUEPRINT.md`; every session, reread both before writing code; update `STATUS.md` as your last act before ending the session.**
+
+## 0. PRODUCT.md — the product contract (written FIRST)
+
+The layer above architecture. Locks *what success is* before anything is designed, so that
+evals, telemetry and the roadmap all trace to one outcome. Copy `templates/PRODUCT.md` from this
+skill's bundle and fill it in with the human — never invent the outcome. Contains, in order:
+
+- **Outcome**: the ONE number the customer will judge the product on, with today's value and
+  the target (e.g. "commitments closed by due date: 40% → 70% in 90 days"). One outcome per
+  product; more is a sign of no decision.
+- **User + opportunity tree** (Teresa Torres): who the user is, and 3-5 *opportunities*
+  (unmet needs / pains, in the user's words) that block the outcome. Solutions hang under
+  opportunities; each solution lists the **assumption** that must hold for it to work.
+- **Failure modes**: what would make the outcome fail even if the code is correct, ranked.
+  For AI features these are things like "invented commitment", "wrong owner", "wrong date".
+  **These ARE the eval KPIs** — /eval-discipline reads this list; one evaluator per row.
+- **Pre-ship evidence**: for each failure mode, how it is measured before deploy (labelled
+  dataset + evaluator name + threshold). No threshold → not shippable.
+- **Post-ship signals**: for each failure mode, how it is observed in production (the event,
+  the user action, the field). **Same name as the eval column** so a prod drop points to the
+  eval to rerun. This is the telemetry spec — design it in, don't bolt it on.
+- **Discovery cadence**: the weekly touchpoint with a real user (Torres: interview, not
+  survey) and where notes land (`docs/discovery/YYYY-MM-DD.md`).
+- **Traceability rule** (verbatim): *Every `## Roadmap` line in BLUEPRINT.md names the
+  opportunity or failure mode it serves. No line, no build.*
+
+Changes to the outcome are rare and dated (`## YYYY-MM-DD — outcome changed because …`),
+same as BLUEPRINT.md decision notes.
 
 ## 1. BLUEPRINT.md — the architecture contract
 
@@ -17,7 +45,7 @@ Written once at project start, updated only by deliberate decision. Contains:
 - **Folder structure**: an ASCII tree of the intended layout.
 - **Module boundaries**: each module/package with a one-line responsibility. If you can't say it in one line, the module is doing too much.
 - **Hard limits**: default **400 lines/file for code, 50 lines/function**. Overridable per project — state the numbers explicitly so the gate can read them.
-- **Roadmap**: `## Roadmap` — one line per planned feature, held loosely (reorder freely as STATUS.md learns). **Delete lines when shipped** — STATUS records what's done; this section is a queue, never a log. Features are pulled from here one at a time into the /tdd loop.
+- **Roadmap**: `## Roadmap` — one line per planned feature, held loosely (reorder freely as STATUS.md learns). **Delete lines when shipped** — STATUS records what's done; this section is a queue, never a log. Features are pulled from here one at a time into the /tdd loop. **Each line ends with `→ <opportunity or failure mode from PRODUCT.md>`** (traceability rule).
 - **Logging discipline** (structured, from day 1): stdlib `logging` (Python) or `pino` (Node). Log at **decision points** (which branch, why) and **error boundaries** (every `except`/`catch`) with **context values** (the ids/inputs that explain the failure), not bare "error occurred". Debugging contract: **never guess — read the logs.** If the logs can't answer the question, the first fix is to add the logging that would have.
 - **Secrets discipline**: secrets live in macOS Keychain; give the project a `.envrc` with `export VAR=$(security find-generic-password -a "$USER" -s VAR -w)` lookups (`direnv allow` once). Never export secrets in shell rc files; never commit secret values in `.envrc`.
 - **The standing rule** (put this verbatim near the top):
@@ -50,7 +78,7 @@ Wire it up:
 - **Feature dev runs /tdd with the red gate**: contract-defining tests are shown to the human at RED (failing) for approval before implementation — the test is the spec.
 - **Invariants get a property test** (hypothesis / fast-check) where a generator is cheap to write — mechanize the invariant instead of hand-picking examples. Mutation testing and fuzzing are NOT default: mutation only as an occasional audit of critical modules; fuzz only for code parsing untrusted input.
 - **Test file created the same day** as the module it covers — not "later".
-- **AI-feature repos**: evals follow **/eval-discipline** — one Evaluator per KPI, per-column reporting, no blended scores.
+- **AI-feature repos**: evals follow **/eval-discipline** — one Evaluator per KPI, per-column reporting, no blended scores. The KPI list IS `PRODUCT.md` → Failure modes; evaluator names match the post-ship signal names.
 
 ## 5. Docs policy
 
@@ -93,3 +121,4 @@ throughout (function craft: naming, arity, purity, composition).
 ## Bundled files
 
 - `scripts/check_discipline.py` — copy into the new repo's `scripts/`.
+- `templates/PRODUCT.md` — copy to the new repo's root and fill in with the human before BLUEPRINT.md.

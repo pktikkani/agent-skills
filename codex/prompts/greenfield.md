@@ -5,8 +5,35 @@ agent (or I, months later) can re-enter in one file-read instead of codebase arc
 Generate the files below in the repo root, adapting content to the actual project — do not
 paste the examples verbatim. If a file already exists, update it; never clobber real content.
 
-Core loop this enforces: **every session, reread `BLUEPRINT.md` before writing code; update
+Core loop this enforces: **`PRODUCT.md` is written before `BLUEPRINT.md`; every session, reread both before writing code; update
 `STATUS.md` as your last act before ending the session.**
+
+## 0. PRODUCT.md — the product contract (written FIRST)
+
+The layer above architecture. Locks *what success is* before anything is designed, so that
+evals, telemetry and the roadmap all trace to one outcome. Write `PRODUCT.md` (sections below) with the human — never invent the outcome. Contains, in order:
+
+- **Outcome**: the ONE number the customer will judge the product on, with today's value and
+  the target (e.g. "commitments closed by due date: 40% → 70% in 90 days"). One outcome per
+  product; more is a sign of no decision.
+- **User + opportunity tree** (Teresa Torres): who the user is, and 3-5 *opportunities*
+  (unmet needs / pains, in the user's words) that block the outcome. Solutions hang under
+  opportunities; each solution lists the **assumption** that must hold for it to work.
+- **Failure modes**: what would make the outcome fail even if the code is correct, ranked.
+  For AI features these are things like "invented commitment", "wrong owner", "wrong date".
+  **These ARE the eval KPIs** — /eval-discipline reads this list; one evaluator per row.
+- **Pre-ship evidence**: for each failure mode, how it is measured before deploy (labelled
+  dataset + evaluator name + threshold). No threshold → not shippable.
+- **Post-ship signals**: for each failure mode, how it is observed in production (the event,
+  the user action, the field). **Same name as the eval column** so a prod drop points to the
+  eval to rerun. This is the telemetry spec — design it in, don't bolt it on.
+- **Discovery cadence**: the weekly touchpoint with a real user (Torres: interview, not
+  survey) and where notes land (`docs/discovery/YYYY-MM-DD.md`).
+- **Traceability rule** (verbatim): *Every `## Roadmap` line in BLUEPRINT.md names the
+  opportunity or failure mode it serves. No line, no build.*
+
+Changes to the outcome are rare and dated (`## YYYY-MM-DD — outcome changed because …`),
+same as BLUEPRINT.md decision notes.
 
 ## 1. BLUEPRINT.md — the architecture contract
 
@@ -27,6 +54,7 @@ Written once at project start, updated only by deliberate decision:
 - **Secrets discipline**: secrets live in macOS Keychain; give the project a `.envrc` with
   `export VAR=$(security find-generic-password -a "$USER" -s VAR -w)` lookups (`direnv allow`
   once). Never export secrets in shell rc files; never commit secret values in `.envrc`.
+- **Roadmap**: `## Roadmap` — one line per planned feature, held loosely; delete lines when shipped (STATUS records what's done). **Each line ends with `→ <opportunity or failure mode from PRODUCT.md>`** (traceability rule).
 - **The standing rule** (verbatim near the top):
   > Every session: reread this file before writing code. New features conform to this
   > structure, or you update this file FIRST with a dated decision note
@@ -62,7 +90,7 @@ confirm it passes clean.
 - Red/green loop for every bug: write the failing test that reproduces it first, watch it
   fail, then fix until green. No fix lands without a test that would have caught it.
 - Test file created the same day as the module it covers — not "later".
-- AI-feature repos: evals follow the eval-discipline prompt — one Evaluator per KPI, per-column reporting, no blended scores.
+- AI-feature repos: evals follow the eval-discipline prompt — one Evaluator per KPI, per-column reporting, no blended scores. The KPI list IS `PRODUCT.md` → Failure modes; evaluator names match the post-ship signal names.
 
 ## 5. Docs policy
 

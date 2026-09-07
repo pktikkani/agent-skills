@@ -7,12 +7,12 @@ Ten Claude Code skills, five Codex prompts.
 
 | Skill | What it does |
 |---|---|
-| `greenfield` | Bootstraps a new repo with a discipline contract: BLUEPRINT.md, STATUS.md, REVIEW_LEDGER.md, and a zero-dependency LOC/docstring pre-commit gate. |
+| `greenfield` | Bootstraps a new repo with a discipline contract: PRODUCT.md (outcome, opportunity tree, failure modes → eval KPIs, post-ship signals), then BLUEPRINT.md, STATUS.md, REVIEW_LEDGER.md, and a zero-dependency LOC/docstring pre-commit gate. |
 | `brownfield` | Same contract retrofitted onto an existing repo. Documents reality, grandfathers oversized files at today's size so they can't grow, never proposes a rewrite. |
 | `handoff` | Overwrites STATUS.md with a fixed-section session snapshot (Now / State / Decisions / Gotchas / Pointers) under ~2k tokens, so the next session re-enters in one file-read. |
 | `crap-score` | CRAP-metric reduction loop (CC² × (1−cov)³ + CC). Scores every function, then iterates cover-first / split-second until the scorer exits 0. Bundles Python and TS/Node scorers. |
 | `optimize-p95` | Profiler-driven latency loop: pick the stack's profiler, attack one hotspot at a time, keep only changes with a measured p95 improvement. |
-| `eval-discipline` | The shape of an eval harness: one small Evaluator per KPI, one report column each, independent thresholds, never a blended score. |
+| `eval-discipline` | The shape of an eval harness: one small Evaluator per KPI, one report column each, independent thresholds, never a blended score. KPI list comes from PRODUCT.md failure modes when present. |
 | `design-canon` | Navigation contract for a long-form design manual — read the relevant profile for a structural decision instead of dumping the whole document. |
 | `design-taste` | Rules for view transitions, hover states, and motion timing that keep a UI from reading as generic AI output. Includes an anti-slop checklist. |
 | `functional-light-js` | Function craft for JS/TS: functions as values, low arity, purity where it pays, composition over flags. |

@@ -2,9 +2,9 @@
 # Install the skills in this repo.
 #
 #   ./install.sh              global: claude/skills -> ~/.claude/skills
-#                                     codex/prompts -> ~/.codex/prompts
+#                                     five of them  -> ~/.codex/skills
 #   ./install.sh --project    project: claude/skills -> ./.claude/skills
-#                                     (Codex prompts are global-only; skipped)
+#                                     (Codex skipped)
 #
 # Idempotent: re-running overwrites the installed copies with this repo's version.
 # Existing skills with the same name are replaced. Unrelated skills are untouched.
@@ -13,6 +13,7 @@ set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODE="global"
+CODEX_SKILLS="greenfield brownfield handoff eval-discipline crap-score"
 
 for arg in "$@"; do
   case "$arg" in
@@ -41,18 +42,19 @@ done
 echo "installed $count Claude Code skill(s)"
 
 if [ "$MODE" = "project" ]; then
-  echo "project mode: skipped Codex prompts (Codex reads ~/.codex/prompts only)"
+  echo "project mode: skipped Codex"
   exit 0
 fi
 
-PROMPT_DEST="$HOME/.codex/prompts"
-mkdir -p "$PROMPT_DEST"
+# Codex CLI reads the same SKILL.md format from ~/.codex/skills (custom prompts are gone).
+CODEX_DEST="$HOME/.codex/skills"
+mkdir -p "$CODEX_DEST"
 
-pcount=0
-for file in "$SRC"/codex/prompts/*.md; do
-  name="$(basename "$file")"
-  cp "$file" "$PROMPT_DEST/$name"
-  echo "  prompt ${name%.md} -> $PROMPT_DEST/$name"
-  pcount=$((pcount + 1))
+ccount=0
+for name in $CODEX_SKILLS; do
+  rm -rf "$CODEX_DEST/$name"
+  cp -R "$SRC/claude/skills/$name" "$CODEX_DEST/$name"
+  echo "  codex  $name -> $CODEX_DEST/$name"
+  ccount=$((ccount + 1))
 done
-echo "installed $pcount Codex prompt(s)"
+echo "installed $ccount Codex skill(s)"

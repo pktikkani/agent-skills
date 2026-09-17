@@ -34,7 +34,8 @@ Written to describe the architecture **AS IT IS**, not as it should be. Contains
 
 - **Stack + why** (inferred): the actual stack in one paragraph. If the "why" is unknown, say so — don't invent a rationale.
 - **Folder structure**: an ASCII tree of the **actual** layout (the real top-level dirs, pruned of noise).
-- **Module boundaries**: each real module/package with a one-line responsibility describing what it *actually does today*. Where a module does too much, say that plainly — it becomes a ledger item, not a rewrite.
+- **Module boundaries**: each real module/package with a one-line responsibility describing what it *actually does today*. Where a module does too much, say that plainly — it becomes a ledger item, not a rewrite. **One-module test, in reverse** (orthogonality, /design-canon Profile 6 A2): pick 2-3 recent commits from `git log --stat` and 2-3 likely future changes, and record how many modules each touches. A small change that spreads across unrelated modules, or shared module-level globals, is recorded as a coupling ledger item — not fixed now.
+- **Homes for facts — as found** (DRY, /design-canon Profile 6 A1): list the facts that live in more than one place today (hand-written types mirroring an API or DB schema, constants repeated across files, near-duplicate helpers, a derived value stored beside its source). For each, name which copy is authoritative *today*. Every multi-home fact becomes a ledger item; new code uses the authoritative copy and adds no further mirror.
 - **Data flow**: how a request / job / message actually moves through the system today (2-6 bullets or a short ASCII diagram).
 - **Hard limits — set to CURRENT reality, grandfathered**:
   - **NEW files** get the standard **400 lines/file, 50 lines/function**.
@@ -97,7 +98,13 @@ close what's fixed, only THEN add new findings with fresh ids.**
 | id | date | reviewer | finding | severity | status |
 |----|------|----------|---------|----------|--------|
 | R1 | YYYY-MM-DD | claude | <finding found during onboarding> | high/med/low | open |
+
+## Standing checks — run on every review
+- **DRY**: a hand-written copy of a schema / API type / constant / rule that has a home in BLUEPRINT.md, or a near-duplicate helper → finding. (/design-canon Profile 6 A1)
+- **Orthogonality**: a diff spreading across unrelated modules, a new module-level global, reaching into another module's internals, or a test that needs global resets → coupling finding. (Profile 6 A2)
 ```
+
+Standing checks apply to **new and touched code** (ratchet law): existing duplication and coupling are the seeded ledger items above, paid down opportunistically — never a bulk cleanup.
 
 Rule for all reviews (also in global CLAUDE.md): read ledger first → verify each open item → close what's fixed → only then add new findings with fresh ids. Never re-file an existing finding under a new id.
 

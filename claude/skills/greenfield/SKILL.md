@@ -43,7 +43,8 @@ Written once at project start, updated only by deliberate decision. Contains:
 
 - **Stack + why**: the chosen stack in one paragraph, and *one* alternative noted as a future experiment (e.g. "Chose FastAPI for X; revisit Litestar if Y").
 - **Folder structure**: an ASCII tree of the intended layout.
-- **Module boundaries**: each module/package with a one-line responsibility. If you can't say it in one line, the module is doing too much.
+- **Module boundaries**: each module/package with a one-line responsibility. If you can't say it in one line, the module is doing too much. **One-module test** (orthogonality, /design-canon Profile 6 A2): list the 3-5 changes most likely to come (swap the DB, new UI, a vendor changes, a rule in PRODUCT.md moves) and name the single module each would touch. A change that lands in more than one module means the boundary is wrong — fix it here, before code exists.
+- **Homes for facts** (DRY, /design-canon Profile 6 A1): for every fact that will appear in more than one place — DB schema, API types, config keys, constants, business rules — name its ONE authoritative home and what is generated or derived from it (e.g. "API types: FastAPI models → OpenAPI → generated TS client; never hand-written"). No hand-maintained mirrors.
 - **Hard limits**: default **400 lines/file for code, 50 lines/function**. Overridable per project — state the numbers explicitly so the gate can read them.
 - **Roadmap**: `## Roadmap` — one line per planned feature, held loosely (reorder freely as STATUS.md learns). **Delete lines when shipped** — STATUS records what's done; this section is a queue, never a log. Features are pulled from here one at a time into the /tdd loop. **Each line ends with `→ <opportunity or failure mode from PRODUCT.md>`** (traceability rule).
 - **Logging discipline** (structured, from day 1): stdlib `logging` (Python) or `pino` (Node). Log at **decision points** (which branch, why) and **error boundaries** (every `except`/`catch`) with **context values** (the ids/inputs that explain the failure), not bare "error occurred". Debugging contract: **never guess — read the logs.** If the logs can't answer the question, the first fix is to add the logging that would have.
@@ -98,6 +99,10 @@ close what's fixed, only THEN add new findings with fresh ids.**
 | id | date | reviewer | finding | severity | status |
 |----|------|----------|---------|----------|--------|
 | R1 | YYYY-MM-DD | claude | <finding> | high/med/low | open / fixed / rejected: <reason> |
+
+## Standing checks — run on every review
+- **DRY**: a hand-written copy of a schema / API type / constant / rule that has a home in BLUEPRINT.md, or a near-duplicate helper → finding. (/design-canon Profile 6 A1)
+- **Orthogonality**: a diff spreading across unrelated modules, a new module-level global, reaching into another module's internals, or a test that needs global resets → coupling finding. (Profile 6 A2)
 ```
 
 Rule for **all** reviews (also in global CLAUDE.md): read ledger first → verify each open item (is it actually still broken?) → close what's fixed / confirm what stands → only then add new findings with fresh sequential ids. Never re-file an existing finding under a new id.

@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Compact the current session into the project's STATUS.md re-entry snapshot. Use when the user types /handoff or says 'hand off' / 'write the handoff'.
+description: Compact the current session into the project's STATUS.md re-entry snapshot and append the session's daybook entry. Use when the user types /handoff or says 'hand off' / 'write the handoff'.
 argument-hint: "What will the next session focus on?"
 ---
 
@@ -48,7 +48,36 @@ Key files:lines, running processes, external state (open PRs, pending tokens, ..
 - If the user passed arguments, treat them as what the next session will focus
   on and weight Now accordingly.
 
+## Daybook entry
+
+After STATUS.md is written, append one entry for this session to the project's
+daybook, at the path given in the user's global agent instructions (CLAUDE.md /
+AGENTS.md). No daybook path configured → skip this step and say so.
+
+The daybook is the opposite of STATUS.md: a LOG, append-only. New entries go at
+the bottom; never edit or reorder earlier ones. One file per month
+(`YYYY-MM.md`) — create it with a one-line `# Daybook — <project> — <YYYY-MM>`
+header if absent. Add the `## <date>` heading only if today's is not already
+the last one in the file.
+
+```
+## <YYYY-MM-DD> <Day>
+### <HH:MM> session — <one-line goal>
+- **Did:** …
+- **Learned:** …
+- **Dead ends:** tried X → failed because Y
+- **Debug:** hypothesis → observed value → verdict
+- **Parked:** idea unrelated to the task #parked
+- **Next:** …
+```
+
+- Entries are per session, not per day. No work done → no entry.
+- Skip empty fields; do not write "none".
+- Items already appended mid-session (parked ideas, dead ends, debug values)
+  are not repeated — fold the rest into this entry.
+- Same secrets rule as STATUS.md.
+
 ## Finish
 
-Tell the user the file path and that the next session picks it up via the
-CLAUDE.md session-start rule.
+Tell the user the STATUS.md path and the daybook path, and that the next
+session picks STATUS.md up via the CLAUDE.md session-start rule.
